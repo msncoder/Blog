@@ -46,22 +46,33 @@
     <section id="posts" class="py-5">
         <div class="container">
             <div class="row g-4">
+                {% for post in object_list %}
+
                 <!-- Post 1 -->
                 <div class="col-md-6 ">
                     <div class="card shadow-sm mb-4">
                         <!-- User Info -->
                         <div class="card-header d-flex align-items-center">
                             <div>
-                                <h6 class="m-0">John Doe</h6>
-                                <small class="text-muted">2 hours ago</small>
-                            </div>
-                        </div>
+                                
+                                    <h6 class="m-0">{{user.username}}</h6>
+                                <p>Created: 
+                                    <span class="created-at">
+                                        {{ post.created_at|date:"F d, Y H:i" }}
+                                    </span>
+                                </p>
+                                </div>
+
+                                </div>
     
                         <!-- Post Content -->
                         <div class="card-body">
-                            <p>This is a Facebook-like post card. You can write your thoughts, share an image, or any content here.</p>
-                            <img src="https://via.placeholder.com/500x300" class="img-fluid rounded" alt="Post Image" />
+                            
+                                <p>{{ post.title }}</p>
+                                <p>{{post.content}}</p>
+
                         </div>
+
     
                         <!-- Interaction Buttons -->
                         <div class="card-footer d-flex justify-content-between align-items-center">
@@ -96,125 +107,23 @@
                                 <!-- Comment Input -->
                                 <div class="d-flex align-items-start mt-3">
                                     <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User">
-                                    <input type="text" class="form-control" placeholder="Write a comment...">
+                                
+                                    
+                                    <form method="post" class="d-flex m-3">
+                                        {% csrf_token %}
+                                        <input type="text" class="form-control" placeholder="Write a comment...">
+                                        <button type="submit">Comment</button>
+                                    </form>
+                                    
+                                
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-    
-                <!-- Post 2 -->
-                <div class="col-md-6">
-                    <div class="card shadow-sm mb-4">
-                        <!-- User Info -->
-                        <div class="card-header d-flex align-items-center">
-                            <div>
-                                <h6 class="m-0">Jane Smith</h6>
-                                <small class="text-muted">1 day ago</small>
-                            </div>
-                        </div>
-    
-                        <!-- Post Content -->
-                        <div class="card-body">
-                            <p>Another example post. This card has a very similar design to Facebook posts.</p>
-                            <img src="https://via.placeholder.com/500x300" class="img-fluid rounded" alt="Post Image" />
-                        </div>
-    
-                        <!-- Interaction Buttons -->
-                        <div class="card-footer d-flex justify-content-between align-items-center">
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-hand-thumbs-up"></i> Like
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#commentsPost2" aria-expanded="false" aria-controls="commentsPost2">
-                                <i class="bi bi-chat-dots"></i> Comment
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-share"></i> Share
-                            </button>
-                        </div>
-    
-                        <!-- Comment Section (Collapsible) -->
-                        <div class="collapse" id="commentsPost2">
-                            <div class="card-body">
-                                <h6 class="fw-bold">Comments</h6>
-                                <div class="comments-area" style="max-height: 150px; overflow-y: auto;">
-                                    <!-- Sample Comment -->
-                                    <div class="comment mb-3">
-                                        <div class="d-flex align-items-start">
-                                            <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User">
-                                            <div class="comment-text bg-light rounded p-2">
-                                                <strong>User 3</strong>
-                                                <p>I love this post!</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Add more comments here -->
-                                </div>
-                                <!-- Comment Input -->
-                                <div class="d-flex align-items-start mt-3">
-                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User">
-                                    <input type="text" class="form-control" placeholder="Write a comment...">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card shadow-sm mb-4">
-                        <!-- User Info -->
-                        <div class="card-header d-flex align-items-center">
-                            <div>
-                                <h6 class="m-0">Jane Smith</h6>
-                                <small class="text-muted">1 day ago</small>
-                            </div>
-                        </div>
-    
-                        <!-- Post Content -->
-                        <div class="card-body">
-                            <p>Another example post. This card has a very similar design to Facebook posts.</p>
-                            <img src="https://via.placeholder.com/500x300" class="img-fluid rounded" alt="Post Image" />
-                        </div>
-    
-                        <!-- Interaction Buttons -->
-                        <div class="card-footer d-flex justify-content-between align-items-center">
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-hand-thumbs-up"></i> Like
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#commentsPost2" aria-expanded="false" aria-controls="commentsPost2">
-                                <i class="bi bi-chat-dots"></i> Comment
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-share"></i> Share
-                            </button>
-                        </div>
-    
-                        <!-- Comment Section (Collapsible) -->
-                        <div class="collapse" id="commentsPost2">
-                            <div class="card-body">
-                                <h6 class="fw-bold">Comments</h6>
-                                <div class="comments-area" style="max-height: 150px; overflow-y: auto;">
-                                    <!-- Sample Comment -->
-                                    <div class="comment mb-3">
-                                        <div class="d-flex align-items-start">
-                                            <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User">
-                                            <div class="comment-text bg-light rounded p-2">
-                                                <strong>User 3</strong>
-                                                <p>I love this post!</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Add more comments here -->
-                                </div>
-                                <!-- Comment Input -->
-                                <div class="d-flex align-items-start mt-3">
-                                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User">
-                                    <input type="text" class="form-control" placeholder="Write a comment...">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+
+             </div>
         </div>
     </section>
     
