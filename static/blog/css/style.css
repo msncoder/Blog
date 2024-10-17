@@ -1,0 +1,15 @@
+/* Custom styles for the blog landing page */
+.hero {
+    background-image: url('https://via.placeholder.com/1200x500');
+    background-size: cover;
+    background-position: center;
+}
+
+.btn-outline-light:hover {
+    background-color: #f8f9fa;
+    color: #212529 !important;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
