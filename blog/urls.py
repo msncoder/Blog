@@ -1,10 +1,10 @@
 from django.urls import path
-from .views import PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView
-
+from blog import views
 urlpatterns = [
-    path('', PostListView.as_view(), name='post_list'),
-    path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
-    path('post/add/', PostCreateView.as_view(), name='post_add'),
-    path('post/<int:pk>/edit/', PostUpdateView.as_view(), name='post_edit'),
-    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
+        # URL for the homepage or post list
+    path('', views.index, name='index'),
+    path('post/<int:post_id>/', views.post_detail, name='post_detail'),
+    path('post/<int:post_id>/like/', views.like_post, name='like_post'),
+    path('post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
+
 ]

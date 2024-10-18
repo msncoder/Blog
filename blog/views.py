@@ -1,56 +1,67 @@
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post
-
-# Create your views here.
-
-# ListView for displaying all blog posts
-class PostListView(ListView):
-    model = Post
-    template_name = 'blog/index.html'
-
-# DetailView for displaying a single blog post
-class PostDetailView(DetailView):
-    model = Post
-    template_name = 'blog/post_detail.html'
-
-# CreateView for adding a new blog post
-class PostCreateView(CreateView):
-    model = Post
-    template_name = 'blog/post_form.html'
-    fields = ['title', 'content']
-    success_url = reverse_lazy('post_list')
-
-# UpdateView for editing a blog post
-class PostUpdateView(UpdateView):
-    model = Post
-    template_name = 'blog/post_form.html'
-    fields = ['title', 'content']
-    success_url = reverse_lazy('post_list')
-
-# DeleteView for deleting a blog post
-class PostDeleteView(DeleteView):
-    model = Post
-    template_name = 'blog/post_confirm_delete.html'
-    success_url = reverse_lazy('post_list')
-
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Post, Comment
+from .models import Post, Like, Comment
+from .forms import PostForm, CommentForm
 
-@login_required  # Ensure only authenticated users can add comments
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)  # Fetch the post being commented on
+# View for the landing page showing all posts
+def index(request):
+    posts = Post.objects.all().order_by('-created_at')
+    return render(request, 'blog/index.html', {'posts': posts})
+
+# View for post details and handling comments
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = post.comments.all()
 
     if request.method == 'POST':
-        comment_text = request.POST.get('comment')
-        
-        # Automatically associate the logged-in user with the comment
-        Comment.objects.create(post=post, user=request.user, comment=comment_text)
-        
-        # Redirect back to the post detail page (or another page)
-        return redirect('post_detail', post_id=post.id)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.user = request.user
+            comment.save()
+            return redirect('post_detail', post_id=post.id)
+    else:
+        form = CommentForm()
 
-    return render(request, 'add_comment.html', {'post': post})
+    return render(request, 'post_detail.html', {'post': post, 'comments': comments, 'form': form})
+
+# View to handle likes
+@login_required
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+    if not created:
+        like.delete()  # If like exists, remove it (toggle feature)
+
+    return redirect('post_detail', post_id=post.id)
+
+# @login_required
+# def add_comment(request, post_id):
+#     if request.method == "POST":
+#         content = request.POST.get('content')
+#         post = Post.objects.get(id=post_id)
+#         comment = Comment(post=post, user=request.user, content=content)
+#         comment.save()
+#         return redirect('index')  # Redirect back to the index page
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Post, Comment
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def add_comment(request, post_id):
+    if request.method == "POST":
+        content = request.POST.get('content')
+        post = get_object_or_404(Post, id=post_id)
+        comment = Comment(post=post, user=request.user, content=content)
+        comment.save()
+
+        # Prepare the response data
+        data = {
+            'username': request.user.username,
+            'content': comment.content,
+            'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),  # Format the timestamp if needed
+        }
+        return JsonResponse(data)
