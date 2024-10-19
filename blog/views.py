@@ -65,3 +65,40 @@ def add_comment(request, post_id):
             'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),  # Format the timestamp if needed
         }
         return JsonResponse(data)
+    
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
+from .models import Post, Like
+
+@require_POST  # Make sure this view only handles POST requests
+def like_post(request, post_id):
+    if request.user.is_authenticated:
+        post = get_object_or_404(Post, id=post_id)
+        liked = False
+        # Check if the user has already liked this post
+        like = Like.objects.filter(post=post, user=request.user).first()
+
+        if like:
+            # If like exists, delete it (unlike)
+            like.delete()
+        else:
+            # If not liked yet, create a new like
+            Like.objects.create(post=post, user=request.user)
+            liked = True
+
+        # Return JSON response with the like status and updated like count
+        return JsonResponse({
+            'liked': liked,
+            'likes_count': post.likes.count(),
+        })
+    return JsonResponse({'error': 'User not authenticated'}, status=403)
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Post
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    return render(request, 'post_detail.html', {'object_or_url': post.get_absolute_url()})

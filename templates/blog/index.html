@@ -1,5 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
+{% load social_share %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -76,18 +77,63 @@
     
                         <!-- Interaction Buttons -->
                         <div class="card-footer d-flex justify-content-between align-items-center">
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-hand-thumbs-up"></i> Like
-                            </button>
+                            <div>
+                                <button class="btn btn-outline-secondary btn-sm like-btn" data-post-id="{{ post.id }}">
+                                    <i class="bi bi-hand-thumbs-up"></i> Like
+                                </button>
+                                <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
+    
+                            </div>
                             <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#commentsPost1" aria-expanded="false" aria-controls="commentsPost1">
                                 <i class="bi bi-chat-dots"></i> Comment
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm">
+                            <!-- Share Button -->
+                            <button class="btn btn-outline-secondary btn-sm share-btn" data-bs-toggle="modal" data-bs-target="#shareModal" data-post-id="{{ post.id }}">
                                 <i class="bi bi-share"></i> Share
                             </button>
+                            
+
+
+                            
+                            
+                            
+                            
+                            
                         </div>
-    
-                        <!-- Comment Section (Collapsible) -->
+
+                        <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="shareModalLabel">Share Post</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Share this post with:</p>
+                                        <!-- Facebook Share Button -->
+                                        {% comment %} <a class="btn btn-primary" id="facebookShare" target="_blank" href="{% post_to_facebook object_or_url 'Share on Facebook' %}" >
+                                        </a> {% endcomment %}
+                        
+                                        <!-- WhatsApp Share Button -->
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ object_or_url|urlencode }}" class="btn btn-primary" id="facebookShare" target="_blank">
+                                            <i class="bi bi-facebook"></i> Share on Facebook
+                                        </a>
+                        
+                                        <a href="https://wa.me/?text={{ object_or_url|urlencode }}" class="btn btn-success" id="whatsappShare" target="_blank">
+                                            <i class="bi bi-whatsapp"></i> Share on WhatsApp
+                                        </a>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+
+                       
+                          <!-- Comment Section (Collapsible) -->
                         <div class="collapse" id="commentsPost{{ post.id }}">
                             <div class="card-body">
                                 <h6 class="fw-bold">Comments</h6>
@@ -193,7 +239,98 @@ function addComment(event, postId) {
         }
     });
 }
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const likeButtons = document.querySelectorAll('.like-btn');
+    
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const likeCountElem = document.getElementById(`like-count-${postId}`);
+
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(`/like-post/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.liked) {
+                    this.innerHTML = '<i class="bi bi-hand-thumbs-up-fill"></i> Liked';
+                } else {
+                    this.innerHTML = '<i class="bi bi-hand-thumbs-up"></i> Like';
+                }
+                likeCountElem.innerHTML = data.likes_count + ' Likes';
+            })
+            .catch(error => console.log('Error:', error));
+        });
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const shareButtons = document.querySelectorAll('.share-btn');
+    shareButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            console.log('Post ID:', postId); // You can use this ID for further actions
+        });
+    });
+});
+
+
+
+{% comment %} 
+document.addEventListener("DOMContentLoaded", function() {
+    const shareButtons = document.getElementsByClassName('share-btn'); // Class name se select karein
+
+    // Apna ngrok URL yahan daalein
+    const ngrokUrl = "https://abcd1234.ngrok.io"; // Isay apne actual ngrok URL se replace karein
+
+    // Loop through the share buttons
+    for (let i = 0; i < shareButtons.length; i++) {
+        shareButtons[i].addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id'); // Ye aapke button ke data attribute se post ID lega
+            const postUrl = `${ngrokUrl}/post/${postId}/`; // Yeh aapka share URL hai
+
+            console.log("Post URL:", postUrl); // URL check karne ke liye
+
+            // Share buttons ko IDs ke zariye select karein
+            const facebookShare = document.getElementById('facebookShare');
+            const whatsappShare = document.getElementById('whatsappShare');
+
+            // Set the share URLs using django_social_share
+            const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+            const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(postUrl)}`;
+
+            console.log("Facebook Share URL:", facebookShareUrl);
+            console.log("WhatsApp Share URL:", whatsappShareUrl);
+
+            // href attributes ko update karein
+            facebookShare.setAttribute('href', facebookShareUrl);
+            whatsappShare.setAttribute('href', whatsappShareUrl);
+
+            // Modal ko open karein
+            var shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
+            shareModal.show();
+        });
+    }
+}); {% endcomment %}
+
+
+
+        
 </script>
+
+
+
 </body>
 </html>
-]
