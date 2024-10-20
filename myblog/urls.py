@@ -23,8 +23,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
-    # path('social/', include('django_social_share.urls', namespace='django_social_share')),
-
+    path('auth/',include('authentication.urls'))
     ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

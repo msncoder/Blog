@@ -13,3 +13,11 @@
 footer a:hover {
     text-decoration: underline;
 }
+
+.custom-img-height {
+    height: 300px;
+    width: 300px;
+    object-fit: cover;
+    /* text-align: center; */
+    /* border: 1px solid red; */
+}

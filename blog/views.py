@@ -2,6 +2,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Post, Like, Comment
 from .forms import PostForm, CommentForm
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Post, Comment
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from .models import Post
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
+from .models import Post, Like
+from authentication.middleware import auth
+
 
 # View for the landing page showing all posts
 def index(request):
@@ -27,28 +39,15 @@ def post_detail(request, post_id):
     return render(request, 'post_detail.html', {'post': post, 'comments': comments, 'form': form})
 
 # View to handle likes
-@login_required
-def like_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    like, created = Like.objects.get_or_create(user=request.user, post=post)
-    if not created:
-        like.delete()  # If like exists, remove it (toggle feature)
-
-    return redirect('post_detail', post_id=post.id)
-
 # @login_required
-# def add_comment(request, post_id):
-#     if request.method == "POST":
-#         content = request.POST.get('content')
-#         post = Post.objects.get(id=post_id)
-#         comment = Comment(post=post, user=request.user, content=content)
-#         comment.save()
-#         return redirect('index')  # Redirect back to the index page
+# def like_post(request, post_id):
+#     post = get_object_or_404(Post, id=post_id)
+#     like, created = Like.objects.get_or_create(user=request.user, post=post)
+#     if not created:
+#         like.delete()  # If like exists, remove it (toggle feature)
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from .models import Post, Comment
-from django.contrib.auth.decorators import login_required
+#     return redirect('post_detail', post_id=post.id)
+
 
 @login_required
 def add_comment(request, post_id):
@@ -67,11 +66,9 @@ def add_comment(request, post_id):
         return JsonResponse(data)
     
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.views.decorators.http import require_POST
-from .models import Post, Like
 
+
+@login_required
 @require_POST  # Make sure this view only handles POST requests
 def like_post(request, post_id):
     if request.user.is_authenticated:
@@ -96,9 +93,30 @@ def like_post(request, post_id):
     return JsonResponse({'error': 'User not authenticated'}, status=403)
 
 
-from django.shortcuts import render, get_object_or_404
-from .models import Post
+
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     return render(request, 'post_detail.html', {'object_or_url': post.get_absolute_url()})
+
+def about(request):
+    return render(request,'blog/about.html')
+
+from django.shortcuts import render, redirect
+from .forms import ContactForm
+
+def contact_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the contact form data to the database
+            return redirect('contact_success')  # Redirect to a success page
+    else:
+        initial_data = {'name': '', 'email': '', 'message': ''}
+        form = ContactForm(initial=initial_data)
+
+    return render(request, 'blog/contact.html', {'form': form})
+
+
+def contact_success_view(request):
+    return render(request,'blog/contact_success.html')
