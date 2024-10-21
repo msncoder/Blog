@@ -7,15 +7,13 @@ class Post(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Add this line
 
     def __str__(self):
         return self.title
 
 # Like model to track likes on a post by a user
-class Like(models.Model):
-    post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class Like(models.Model):
     post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
@@ -30,11 +28,7 @@ class Like(models.Model):
 
 
 
-    class Meta:
-        unique_together = ('post', 'user')  # Ensure that one user can only like a post once
 
-    def __str__(self):
-        return f"{self.user} likes {self.post}"
 
 # Comment model to allow multiple comments by a user
 class Comment(models.Model):
