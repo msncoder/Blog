@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
+
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -11,7 +13,9 @@ from blog.decorators import login_required_custom
 # View for the landing page showing all posts
 def index(request):
     posts = Post.objects.all().order_by('-created_at')
-    return render(request, 'blog/index.html', {'posts': posts})
+    form = SubscriberForm()
+
+    return render(request, 'blog/index.html', {'posts': posts,'form':form})
 
 
 # View for post details and handling comments
@@ -102,3 +106,90 @@ def contact_success_view(request):
 # Static "About" page view
 def about(request):
     return render(request, 'blog/about.html')
+
+
+
+
+
+
+from django.contrib import messages
+from .models import Subscriber
+from .forms import SubscriberForm
+
+def subscribe(request):
+    if request.method == 'POST':
+        form = SubscriberForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            if not Subscriber.objects.filter(email=email).exists():
+                Subscriber.objects.create(email=email)
+                messages.success(request, "You have successfully subscribed!")
+            else:
+                messages.warning(request, "This email is already subscribed.")
+            return redirect('index')
+    else:
+        form = SubscriberForm()
+    return render(request, 'blog/index.html', {'form': form})
+
+
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Post, Comment
+from .forms import PostForm, CommentForm
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def dashboard(request):
+    posts = Post.objects.all()  # Fetch all posts
+    return render(request, 'blog/dashboard.html', {'posts': posts})
+
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)  # Handle file uploads
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user  # Associate post with the logged-in user
+            post.save()
+            return redirect('dashboard')  # Redirect to the dashboard after creating
+    else:
+        form = PostForm()
+    return render(request, 'blog/create_post.html', {'form': form})
+
+@login_required
+def update_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/update_post.html', {'form': form, 'post': post})
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.method == 'POST':
+        post.delete()
+        return redirect('dashboard')
+    return render(request, 'blog/delete_post.html', {'post': post})
+
+
+@login_required
+def post_comments(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    comments = post.comments.all()  # Fetch comments related to this post
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.user = request.user
+            comment.save()
+            return redirect('post_comments', post_id=post.id)
+    else:
+        form = CommentForm()
+    
+    return render(request, 'blog/post_comments.html', {'post': post, 'comments': comments, 'form': form})

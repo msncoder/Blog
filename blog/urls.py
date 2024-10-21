@@ -11,5 +11,10 @@ urlpatterns = [
     # path('post/<int:post_id>/like/', views.like_post, name='like_post'),
     path('post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
     path('like-post/<int:post_id>/', views.like_post, name='like_post'),
-
+    path('subscribe/', views.subscribe, name='subscribe'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('create_post/', views.create_post, name='create_post'),
+    path('update_post/<int:post_id>/', views.update_post, name='update_post'),
+    path('delete_post/<int:post_id>/', views.delete_post, name='delete_post'),
+    path('post_comments/<int:post_id>/', views.post_comments, name='post_comments'),
 ]

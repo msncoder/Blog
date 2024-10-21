@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.conf import settings
+from django.db import models
+
 
 # Post model with title, description, image
 class Post(models.Model):
@@ -11,6 +15,23 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        # Check if it's a new post
+        if not self.pk:  
+            super().save(*args, **kwargs)  # Save the post first
+            # Send email to all subscribers
+            subscribers = Subscriber.objects.all()
+            for subscriber in subscribers:
+                send_mail(
+                    'New Post: ' + self.title,
+                    'Check out our new post: ' + self.title,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [subscriber.email],
+                    fail_silently=False,
+                )
+        else:
+            super().save(*args, **kwargs)
 
 # Like model to track likes on a post by a user
 
@@ -25,6 +46,19 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user} likes {self.post}"
+    
+
+
+# models.py
+from django.db import models
+
+class Subscriber(models.Model):
+    email = models.EmailField(unique=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+
 
 
 

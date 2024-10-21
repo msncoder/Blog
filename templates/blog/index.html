@@ -34,6 +34,7 @@
                     <li>
                         {% if user.is_authenticated %}
                         <a href="{% url "index" %}" class="btn btn-warning">{{request.user.username}}</a>
+                        <a href="{% url "dashboard" %}" class="btn btn-primary">Dashboard</a>
                         <a href="{% url "logout" %}" class="btn btn-danger">Logout</a>
                         {% else %}
                         <a href="{% url "register" %}" class="btn btn-primary">Signup</a>
@@ -44,6 +45,18 @@
             </div>
         </div>
     </nav>
+
+    <!-- Display messages here -->
+    {% if messages %}
+    <div class="mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Hero Section -->
     <header class="hero bg-dark text-white py-5">
@@ -77,9 +90,9 @@
     
                         <!-- Post Content -->
                         <div class="card-body">
+                            <p><img src="{{ post.image.url }}" alt="Image" class="mx-auto d-block" style="width: 80%; height: 200px;"></p>
                             <h2><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h2>
                             <p>{{ post.description|truncatewords:30 }}</p>
-                            <p><img src="{{ post.image.url }}" alt="Image" height="100"></p>
                 
                         </div>
 
@@ -224,12 +237,18 @@
         <div class="container">
             <h3>Subscribe for Updates</h3>
             <p>Stay updated with the latest posts and news.</p>
-            <form class="d-flex justify-content-center">
-                <input type="email" class="form-control me-2" placeholder="Enter your email">
+    
+        
+    
+            <form method="POST" action="{% url 'subscribe' %}" class="d-flex justify-content-center">
+                {% csrf_token %}
+                {{ form.email }}
                 <button type="submit" class="btn btn-outline-light">Subscribe</button>
             </form>
         </div>
     </section>
+    
+    
 
 
 

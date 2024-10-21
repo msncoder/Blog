@@ -36,5 +36,3 @@ def user_logout(request):  # Renamed logout view to avoid conflict
     return redirect('index')
 
 
-def dashboard(request):
-    pass
