@@ -1,8 +1,5 @@
 
 
-{% load custom_filters %}
-
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -51,7 +48,7 @@
 
     <!-- Centered Container -->
     
-    <div class="container mt-5">
+    <div class="container mt-5 text-center" style="height:60vh;">
         <h2>Delete Post</h2>
         <p>Are you sure you want to delete the post titled "<strong>{{ post.title }}</strong>"?</p>
         <form method="POST">
@@ -60,6 +57,7 @@
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
+    
 
     <footer class="bg-dark text-white py-4">
         <div class="container text-center">

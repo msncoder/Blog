@@ -140,8 +140,9 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def dashboard(request):
-    posts = Post.objects.all()  # Fetch all posts
+    posts = Post.objects.filter(user=request.user)  # Fetch posts of the logged-in user
     return render(request, 'blog/dashboard.html', {'posts': posts})
+
 
 @login_required
 def create_post(request):

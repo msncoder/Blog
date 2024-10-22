@@ -46,10 +46,13 @@
 
     <!-- Centered Container -->
     <div class="container mt-5">
-        <h2>Your Posts</h2>
+        <h2 class="text-center">Your Posts</h2>
         <a href="{% url 'create_post' %}" class="btn btn-primary mb-3">Create Post</a>
-    
-        <table class="table table-bordered">
+
+        
+        {% if posts %}
+
+        <table class="table table-bordered " style="height:50vh;">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -63,15 +66,15 @@
                 {% for post in posts %}
                 <tr>
                     <td>{{ post.title }}</td>
-                    <td>{{ post.description }}</td>
+                    <td>{{ post.description|truncatewords:30 }}</td>                            
+
                     <td>{{ post.likes.count }}</td>
                     <td>
                         <a href="{% url 'post_comments' post.id %}">View Comments</a>
                     </td>
                     <td>
                         <a href="{% url 'update_post' post.id %}" class="btn btn-warning">Edit</a>
-                        <form method="POST" action="{% url 'delete_post' post.id %}" style="display:inline;">
-                            {% csrf_token %}
+                        <form method="GET" action="{% url 'delete_post' post.id %}" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </td>
@@ -79,7 +82,14 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        {% else %}
+        <h1 class="text-center" style="height:38.7vh;">No posts in the database. Create a new post to get started!</h1>
+        {% endif %}
+
     </div>
+
+
     <footer class="bg-dark text-white py-4">
         <div class="container text-center">
             <p>&copy; 2024 MyBlog. All rights reserved.</p>
