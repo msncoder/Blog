@@ -157,5 +157,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'msaadnaseem2000@gmail.com'
-EMAIL_HOST_PASSWORD = 'ankt kkqw cmnt nvpe'
+EMAIL_HOST_USER = 'your gmail'
+EMAIL_HOST_PASSWORD = 'YOur app password'

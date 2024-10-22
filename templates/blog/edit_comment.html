@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{% endblock title %}
+{% block content %}
+<div class="bg-light text-dark d-flex justify-content-center align-items-center text-center">
+    <div class="container mt-5">
+        <h2 class="p-3 m-3">Edit Your Comment</h2>
+        <form method="POST" class="p-3 m-3">
+            {% csrf_token %}
+            {{ form.content }}
+            <button type="submit" class="btn btn-success p-3 m-3">Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock content %}

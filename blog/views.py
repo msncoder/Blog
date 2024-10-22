@@ -31,7 +31,7 @@ def post_detail(request, post_id):
         comment.save()
         return redirect('post_detail', post_id=post.id)
 
-    return render(request, 'post_detail.html', {'post': post, 'comments': comments, 'form': form})
+    return render(request, 'blog/post_detail.html', {'post': post, 'comments': comments, 'form': form})
 
 
 # Ajax-based view for adding comments
@@ -95,8 +95,10 @@ def contact_view(request):
         form.save()
         return redirect('contact_success')
 
+    else:
+        initial_data = {'name': '', 'email': '','message':''}
+        form = ContactForm(initial=initial_data)
     return render(request, 'blog/contact.html', {'form': form})
-
 
 # View for successful contact form submission
 def contact_success_view(request):
@@ -181,8 +183,10 @@ def delete_post(request, post_id):
 @login_required
 def post_comments(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    comments = post.comments.all()  # Fetch comments related to this post
+    comments = post.comments.all()  # Fetch all comments for this post
+
     if request.method == 'POST':
+        # Handle adding a new comment
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
@@ -192,5 +196,41 @@ def post_comments(request, post_id):
             return redirect('post_comments', post_id=post.id)
     else:
         form = CommentForm()
+
+    return render(request, 'blog/post_comments.html', {
+        'post': post,
+        'comments': comments,
+        'form': form,
+    })
+
+
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    post = comment.post
     
-    return render(request, 'blog/post_comments.html', {'post': post, 'comments': comments, 'form': form})
+    # Ensure the logged-in user is the author of the post
+    if post.user != request.user:
+        return redirect('post_comments', post_id=post.id)
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('post_comments', post_id=comment.post.id)
+    else:
+        form = CommentForm(instance=comment)
+
+    return render(request, 'blog/edit_comment.html', {'form': form, 'comment': comment})
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    post = comment.post
+    
+    # Ensure the logged-in user is the author of the post
+    if post.user == request.user:
+        comment.delete()
+
+    return redirect('post_comments', post_id=post.id)
