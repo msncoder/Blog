@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
 {% block title %}Dashboard{% endblock title %}
-
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center">Your Posts</h2>
+<div class="container bg-secondary text-white" style="height:100vh;";>
+
+    <h2 class="text-center pt-5">Your Posts</h2>
     <a href="{% url 'create_post' %}" class="btn btn-primary mb-3">Create Post</a>
 
     
     {% if posts %}
 
-    <table class="table table-bordered " style="height:50vh;">
+    <table class="table table-bordered text-white" style="height:50vh;">
         <thead>
             <tr>
                 <th>Title</th>

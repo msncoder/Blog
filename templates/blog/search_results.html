@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<section class="py-5 text-center">
+    <div class="container">
+        <h1>Search Results for "{{ query }}"</h1>
+        <hr>
+        {% if results %}
+
+        {% comment %} <a href="{% url 'post_detail' post.id %}"> {% endcomment %}
+        <div class="row d-flex justify-content-center align-items-center">
+            {% for post in results %}
+
+            <div class="col-md-1"></div>
+            <div class="col-md-6">
+                <h2 ><a class="text-white text-decoration-none" href="{% url 'post_detail' post.id %}">Title: {{ post.title }}</a></h2>
+                <p class="text-white">Description: {{ post.description|truncatewords:15 }}</p>            
+                    <p class="text-white">Published on {{ post.created_at }}</p>
+                <p>{{ post.content }}</p>
+            </div>
+        
+            <div class="col-md-4">
+                <p><img src="{{ post.image.url }}" alt="Image" class="mx-auto d-block" style="width: 80%; height: 200px;"></p>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        {% endfor %}
+    </a>
+        
+          
+        {% else %}
+            <p>No posts found matching your query.</p>
+        {% endif %}
+    </div>
+</section>
+
+
+{% comment %} <div class="row d-flex justify-content-center align-items-center">
+    <div class="col-md-1"></div>
+
+    <div class="col-md-6">
+        <h1>{{ post.title }}</h1>
+        <p class="text-white">Published on {{ post.created_at }}</p>
+        <p>{{ post.content }}</p>
+    </div>
+
+    <div class="col-md-4">
+        <p><img src="{{ post.image.url }}" alt="Image" class="mx-auto d-block" style="width: 80%; height: 200px;"></p>
+    </div>
+
+    <div class="col-md-1"></div>
+</div> {% endcomment %}
+
+{% endblock content %}

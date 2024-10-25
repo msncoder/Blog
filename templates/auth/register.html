@@ -2,9 +2,9 @@
 {% block title %}Register{% endblock title %}
 {% block content %}
 <!-- Centered Container -->
-<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+<div class="d-flex justify-content-center align-items-center text-white bg-secondary" style="height: 100vh;">
     <div class="col-sm-6">
-        <h2 class="text-muted text-center">Register</h2>
+        <h2 class="text-white text-center">Register</h2>
         <form action="{% url 'register' %}" method="POST">
             {% csrf_token %}
             <div class="form-group mb-3">
@@ -24,8 +24,8 @@
                 <span class="text-danger">{{form.password2.errors}}</span>
             </div>  
 
-            <button type="submit" class="btn btn-dark">Submit</button>
-            <a href="{% url 'login' %}" class="btn btn-default">Already have an account</a>
+            <button type="submit" class="btn text-white btn-outline-light">Submit</button>
+            <a href="{% url 'login' %}" class="btn btn-default text-white btn-outline-light">Already have an account</a>
 
         </form>
     </div>

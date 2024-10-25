@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}About{% endblock title %}
 {% block content %}
-<section class="py-5 bg-light hero">
+<section class="py-5 bg-light hero ">
     <div class="container text-center">
         <h1 class="display-4">About Us</h1>
         <p class="lead">Welcome to MyBlog, a place where stories, thoughts, and ideas come to life.</p>
@@ -10,7 +10,7 @@
 </section>
 
 <!-- Mission Section -->
-<section class="py-5">
+<section class="py-5 bg-secondary text-white">
     <div class="container ">
         <div class="row d-flex justify-content-center align-items-center" >
             <div class="col-md-1"></div>
@@ -35,13 +35,13 @@
 
 <!-- Call to Action -->
 {% if not user.is_authenticated %}
-<section class="py-5 text-center">
+<section class="py-5 text-center bg-primary text-white">
     <div class="container">
         <h2>Join Our Community</h2>
         <p>Whether you're a writer or a reader, MyBlog has a place for you. Sign up now to get the latest posts
             and share your thoughts!</p>
-        <a href="{% url "register" %}" class="btn btn-primary btn-lg">Sign Up</a>
-        <a href="{% url "login" %}" class="btn btn-primary btn-lg">Login</a>
+        <a href="{% url "register" %}" class="btn btn-outline-light btn-primary btn-lg">Sign Up</a>
+        <a href="{% url "login" %}" class="btn btn-outline-light btn-primary btn-lg">Login</a>
     </div>
 </section>
 {% endif %}

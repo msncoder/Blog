@@ -3,9 +3,9 @@
 {% block title %}{% endblock title %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+<div class="d-flex justify-content-center align-items-center text-white bg-secondary" style="height: 100vh;">
     <div class="col-sm-6">
-    <h2 class="text-muted text-center">Login</h2>
+    <h2 class="text-white text-center">Login</h2>
     {% if form.non_field_errors %}
     <small class="text-danger">
         {{form.non_field_errors.as_ul}}
@@ -27,8 +27,8 @@
         </div>  
 
 
-        <button type="submit" class="btn btn-dark mt-2">Login</button>
-        <a href="{% url "register" %}" class="btn btn-default mt-2">Create New Account</a>
+        <button type="submit" class="btn  text-white btn-outline-light mt-2">Login</button>
+        <a href="{% url "register" %}" class="btn btn-default btn-outline-light text-white mt-2">Create New Account</a>
     </form>
 </div>
 </div>

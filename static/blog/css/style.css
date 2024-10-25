@@ -8,6 +8,7 @@
 .btn-outline-light:hover {
     background-color: #f8f9fa;
     color: #212529 !important;
+    
 }
 
 footer a:hover {
@@ -20,5 +21,77 @@ footer a:hover {
     object-fit: cover;
     /* text-align: center; */
     /* border: 1px solid red; */
+}
+
+
+/* Navbar dark theme */
+.navbar {
+    background-color: #212529; /* Dark background */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Soft shadow */
+    height: 80px; /* Half height of the viewport */
+    display: flex;
+    align-items: center; /* Center content vertically */
+}
+
+/* Sticky header */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+/* Adjust logo container and size */
+.logo-container {
+    background-color: #ffffff; /* White background for the logo */
+    padding: 5px;
+    border-radius: 8px; /* Slightly rounded corners */
+}
+
+.logo-img-large {
+    height: 50px; /* Larger logo size */
+}
+
+/* Navbar link styles */
+.navbar-dark .navbar-nav .nav-link {
+    color: #f8f9fa; /* Light text */
+    transition: blue 0.3s ease;
+}
+
+.navbar-dark .navbar-nav .nav-link.active, 
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #1e90ff; /* Bright blue on hover/active */
+    text-shadow: 0px 0px 6px rgba(30, 144, 255, 0.5); /* Glow effect */
+}
+
+/* Modal styling */
+.modal-content {
+    background-color:  #f8f9fa; /* Dark background for the modal */
+    color: #343a40; /* Light text color */
+}
+
+/* Form control in modal */
+.input-group .form-control {
+    background-color: #ffffff;
+    color:  #495057;
+    border: 1px solid #6c757d; /* Border for form control */
+}
+
+
+
+.like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    transition: transform 0.2s;
+}
+
+.like-btn .fa-heart {
+    color: gray;
+}
+
+.like-btn.liked .fa-heart {
+    color: red;
+    transform: scale(1.3);
 }
 

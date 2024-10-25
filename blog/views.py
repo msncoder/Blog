@@ -11,17 +11,38 @@ from blog.decorators import login_required_custom
 
 
 # View for the landing page showing all posts
+# def index(request):
+#     posts = Post.objects.all().order_by('-created_at')
+    
+#     form = SubscriberForm()
+
+#     return render(request, 'blog/index.html', {'posts': posts,'form':form})
+
+
 def index(request):
     posts = Post.objects.all().order_by('-created_at')
+    
+    # Prepare a set of liked post IDs for the logged-in user
+    liked_post_ids = set()
+    if request.user.is_authenticated:
+        liked_posts = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
+        liked_post_ids = set(liked_posts)
+
     form = SubscriberForm()
 
-    return render(request, 'blog/index.html', {'posts': posts,'form':form})
+    return render(request, 'blog/index.html', {
+        'posts': posts,
+        'form': form,
+        'liked_post_ids': liked_post_ids,  # Pass the liked post IDs to the template
+    })
 
 
 # View for post details and handling comments
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     comments = post.comments.all()
+    liked = post.likes.filter(user=request.user).exists()  # Check if the user liked this post
+    likes_count = post.likes.count()
     form = CommentForm(request.POST or None)
 
     if request.method == 'POST' and form.is_valid():
@@ -31,7 +52,8 @@ def post_detail(request, post_id):
         comment.save()
         return redirect('post_detail', post_id=post.id)
 
-    return render(request, 'blog/post_detail.html', {'post': post, 'comments': comments, 'form': form})
+    return render(request, 'blog/post_detail.html', {'post': post, 'comments': comments, 'form': form, 'likes_count': likes_count,
+        'liked': liked,})
 
 
 # Ajax-based view for adding comments
@@ -85,6 +107,7 @@ def like_post(request, post_id):
         'liked': liked,
         'likes_count': post.likes.count(),  # Get the total likes for the post
     })
+
 
 # Contact view for submitting the contact form
 # @login_required_custom
@@ -234,3 +257,13 @@ def delete_comment(request, comment_id):
         comment.delete()
 
     return redirect('post_comments', post_id=post.id)
+
+
+def search_posts(request):
+    query = request.GET.get('q')
+    if query:
+        results = Post.objects.filter(title__icontains=query) | Post.objects.filter(description__icontains=query)
+    else:
+        results = Post.objects.none()  # Return no results if no query
+
+    return render(request, 'blog/search_results.html', {'results': results, 'query': query})

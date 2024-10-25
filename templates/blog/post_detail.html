@@ -1,53 +1,53 @@
 {% extends "base.html" %}
-{% block {{post.title}} %}{% endblock  %}
+{% block title %}{{ post.title }}{% endblock %} <!-- Dynamic title block -->
+
 {% block content %}
-<section class="py-5">
-    <div class="container ">
-        <div class="row d-flex justify-content-center align-items-center" >
+<section class="py-5 text-center bg-secondary text-white">
+    <div class="container">
+        <div class="row d-flex justify-content-center align-items-center">
             <div class="col-md-1"></div>
 
             <div class="col-md-6">
-                <h1>{{ post.title }}</h1>
-                <p class="text-muted">Published on {{ post.created_at }}</p>
+                <h2 ><a class="text-white" href="{% url 'post_detail' post.id %}">Title: {{ post.title }}</a></h2>
+                <p class="text-white">Description: {{ post.description|truncatewords:15 }}</p>                <p class="text-white">Published on {{ post.created_at }}</p>
                 <p>{{ post.content }}</p>
-
             </div>
+
             <div class="col-md-4">
                 <p><img src="{{ post.image.url }}" alt="Image" class="mx-auto d-block" style="width: 80%; height: 200px;"></p>
             </div>
-            <div class="col-md-1"></div>
 
+            <div class="col-md-1"></div>
+        </div>
+
+        <!-- Comment Section -->
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Leave a Comment</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Submit Comment</button>
+                </form>
+
+                <hr>
+
+                <!-- Comments List -->
+                <h3>Comments</h3>
+                {% for comment in comments %}
+                <ul class="list-group">
+                    <li class="list-group-item m-3">
+                        <strong>{{ comment.user.username }}</strong>: {{ comment.content }} 
+                        <em>({{ comment.created_at }})</em>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No comments yet. Be the first to comment!</li>
+                </ul>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </section>
 
-
-<!-- Post Detail Section -->
-
-
-<!-- Comment Form and Comments -->
-<section class="py-5">
-    <div class="container">
-        <h2>Leave a Comment</h2>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Submit Comment</button>
-        </form>
-
-        <hr>
-
-        <h3>Comments</h3>
-        <ul class="list-group">
-            {% for comment in comments %}
-            <li class="list-group-item">
-                <strong>{{ comment.user.username }}</strong>: {{ comment.content }} <em>({{ comment.created_at }})</em>
-            </li>
-            {% empty %}
-            <li class="list-group-item">No comments yet. Be the first to comment!</li>
-            {% endfor %}
-        </ul>
-    </div>
-</section>
-
 {% endblock content %}
+

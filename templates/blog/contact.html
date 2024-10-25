@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Contact Us{% endblock title %}
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+<div class="d-flex justify-content-center align-items-center bg-secondary text-white" style="height: 100vh;">
     <div class="col-sm-6">
-        <h2 class="text-muted text-center">Contact Us</h2>
+        <h2 class="text-center text-white">Contact Us</h2>
         <form action="{% url 'contact' %}" method="POST">
             {% csrf_token %}
             <div class="form-group mb-3">
@@ -24,7 +24,7 @@
                 <span class="text-danger">{{ form.message.errors }}</span>
             </div>  
 
-            <button type="submit" class="btn btn-dark">Submit</button>
+            <button type="submit" class="btn btn-outline-light">Submit</button>
         </form>
     </div>
 </div>

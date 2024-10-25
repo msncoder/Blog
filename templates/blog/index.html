@@ -30,19 +30,19 @@
     </header>
 
     <!-- Posts Section -->
-    <section id="posts" class="py-5">
+    <section id="posts" class="py-5 bg-secondary">
         <div class="container">
             <div class="row g-4">
                 {% for post in posts %}
                 <div class="col-md-6">
-                    <a href="{% url "post_detail" post.id %}">
+                    <a class="text-dark text-decoration-none" href="{% url "post_detail" post.id %}">
                     <div class="card shadow-sm mb-4">
                         <!-- User Info -->
-                        <div class="card-header d-flex align-items-center">
+                        <div class="card-header d-flex align-items-center text-dark text-decoration-none">
                             <div>
                                 <h6 class="m-0">{{ post.user.username }}</h6>
                                 <p>Created: 
-                                    <span class="created-at">
+                                    <span class=" text-dark text-underline-none">
                                         {{ post.created_at|date:"F d, Y H:i" }}
                                     </span>
                                 </p>
@@ -51,18 +51,27 @@
 
                         <!-- Post Content -->
                         <div class="card-body">
+                            <h2><a class="text-dark text-decoration-none" href="{% url 'post_detail' post.id %}">Title: {{ post.title }}</a></h2>
+                            <p class="text-dark">Description: {{ post.description|truncatewords:15 }}</p>
                             <p><img src="{{ post.image.url }}" alt="Image" class="mx-auto d-block" style="width: 80%; height: 200px;"></p>
-                            <h2><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h2>
-                            <p>{{ post.description|truncatewords:15 }}</p>
                         </div>
 
                         <!-- Interaction Buttons -->
                         <div class="card-footer d-flex justify-content-between align-items-center">
+                           
                             <div>
                                 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                                <button class="like-btn" data-post-id="{{ post.id }}">Like</button>
-                                <span id="like-count-{{ post.id }}">{{ post.likes.count }} Likes</span>
+                                <button class="like-btn" data-post-id="{{ post.id }}">
+                                    {% if user.is_authenticated and post.id in liked_post_ids %}
+                                        <i class="fas fa-heart" style="color: red;"></i> Liked
+                                    {% else %}
+                                        <i class="far fa-heart"></i> Like
+                                    {% endif %}
+                                </button>
+                                <span class="text-dark" id="like-count-{{ post.id }}">{{ post.likes.count }} Likes</span>
                             </div>
+                            
+
                             <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#commentsPost{{ post.id }}" aria-expanded="false" aria-controls="commentsPost{{ post.id }}">
                                 <i class="bi bi-chat-dots"></i> Comment
                             </button>
@@ -197,130 +206,10 @@
 
 {% block script %}
 
-{% comment %} <script>
-    function addComment(event, postId) {
-        event.preventDefault();  // Prevent the form from submitting normally
-        const form = event.target;  // Get the form that triggered the event
-        const content = form.querySelector('input[name="content"]').value;  // Get the content of the comment
 
-        $.ajax({
-            type: 'POST',
-            url: `/post/${postId}/comment/`,  // URL to post comment
-            data: {
-                content: content,
-                csrfmiddlewaretoken: '{{ csrf_token }}',  // CSRF token for security
-            },
-            success: function(data) {
-                const commentHtml = `
-                    <div class="comment mb-3">
-                        <div class="d-flex align-items-start">
-                            <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User">
-                            <div class="comment-text bg-light rounded p-2">
-                                <strong>${data.username}</strong>
-                                <p>${data.content}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.getElementById(`commentsList${postId}`).innerHTML += commentHtml;  // Add comment to comments list
-                form.reset();  // Reset the form
-            }
-        });
-    }
-
-
-    $(document).ready(function() {
-        const likeButtons = $('.like-btn');
-    
-        likeButtons.on('click', function() {
-            const postId = $(this).data('post-id');  // Get post ID from data attribute
-            const likeCountElem = $(`#like-count-${postId}`);  // Select the like count element
-    
-            // Get CSRF token
-            const csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
-    
-            $.ajax({
-                type: 'POST',
-                url: `/like-post/${postId}/`,  // Replace with your like URL
-                data: {
-                    csrfmiddlewaretoken: csrftoken  // Ensure CSRF token is sent
-                },
-                success: function(response) {
-                    // Update the like count and liked status
-                    if (response.liked) {
-                        $(this).html('<i class="bi bi-hand-thumbs-up-fill"></i> Liked');  // Update button for liked state
-                    } else {
-                        $(this).html('<i class="bi bi-hand-thumbs-up"></i> Like');  // Update button for unliked state
-                    }
-                    // Update the like count display
-                    likeCountElem.text(`${response.likes_count} Likes`);
-                }.bind(this),  // Bind 'this' to ensure correct context in success callback
-                error: function(xhr) {
-                    if (xhr.status === 403) {
-                        // Show the error modal if the user is not authenticated
-                        $('#errorMessage').text('Please log in to like this post.'); // Set the error message
-                        $('#errorModal').modal('show'); // Show the modal
-                    } else {
-                        console.log('Error liking the post:', xhr.responseText);
-                    }
-                }
-            });
-        });
-    });
-    
-    
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const shareButtons = document.querySelectorAll('.share-btn');
-        shareButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const postId = this.getAttribute('data-post-id');
-                console.log('Post ID:', postId); // You can use this ID for further actions
-            });
-        });
-    });
-    
-    
-    
-    
-    
-</script> {% endcomment %}
 
 <script>
-    {% comment %} function addComment(event, postId) {
-        event.preventDefault();  // Prevent the form from submitting normally
-    
-        const form = event.target;  // Get the form that triggered the event
-        const content = form.querySelector('input[name="content"]').value;  // Get the content of the comment
-    
-        $.ajax({
-            type: 'POST',
-            url: `/post/${postId}/comment/`,  // URL to post comment
-            data: {
-                content: content,
-                csrfmiddlewaretoken: '{{ csrf_token }}',  // CSRF token for security
-            },
-            success: function(data) {
-                // On success, append the new comment to the comments area
-                const commentHtml = `
-                    <div class="comment mb-3">
-                        <div class="d-flex align-items-start">
-                            <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User">
-                            <div class="comment-text bg-light rounded p-2">
-                                <strong>${data.username}</strong>
-                                <p>${data.content}</p>
-                            </div>
-                        </div>
-                    </div>`;
-                $(`#commentsList${postId}`).append(commentHtml);  // Add the new comment to the comment list
-                form.reset();  // Clear the input field
-            },
-            error: function(xhr, status, error) {
-                console.error(error);  // Handle error
-                alert("An error occurred while adding your comment. Please try again.");
-            }
-        });
-    } {% endcomment %}
+  
     
     function addComment(event, postId) {
         event.preventDefault();  // Prevent the form from submitting normally
@@ -364,7 +253,13 @@
     }
     
     
-    {% comment %} 
+    
+      
+
+
+   
+    
+
     $(document).ready(function() {
         const likeButtons = $('.like-btn');
     
@@ -384,49 +279,9 @@
                 success: function(response) {
                     // Update the like count and liked status
                     if (response.liked) {
-                        $(this).html('<i class="bi bi-hand-thumbs-up-fill"></i> Liked');  // Update button for liked state
+                        $(this).html('<i class="fas fa-heart" style="color: red;"></i> Liked');  // Show filled red heart for liked state
                     } else {
-                        $(this).html('<i class="bi bi-hand-thumbs-up"></i> Like');  // Update button for unliked state
-                    }
-                    // Update the like count display
-                    likeCountElem.text(`${response.likes_count} Likes`);
-                }.bind(this),  // Bind 'this' to ensure correct context in success callback
-                error: function(xhr) {
-                    if (xhr.status === 403) {
-                        // Show the error modal if the user is not authenticated
-                        $('#errorMessage').text('Please log in to like this post.'); // Set the error message
-                        $('#errorModal').modal('show'); // Show the modal
-                    } else {
-                        console.log('Error liking the post:', xhr.responseText);
-                    }
-                }
-            });
-        });
-    }); {% endcomment %}
-    
-    
-    $(document).ready(function() {
-        const likeButtons = $('.like-btn');
-    
-        likeButtons.on('click', function() {
-            const postId = $(this).data('post-id');  // Get post ID from data attribute
-            const likeCountElem = $(`#like-count-${postId}`);  // Select the like count element
-    
-            // Get CSRF token
-            const csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
-    
-            $.ajax({
-                type: 'POST',
-                url: `/like-post/${postId}/`,  // Replace with your like URL
-                data: {
-                    csrfmiddlewaretoken: csrftoken  // Ensure CSRF token is sent
-                },
-                success: function(response) {
-                    // Update the like count and liked status
-                    if (response.liked) {
-                        $(this).html('<i class="bi bi-hand-thumbs-up-fill"></i> Liked');  // Update button for liked state
-                    } else {
-                        $(this).html('<i class="bi bi-hand-thumbs-up"></i> Like');  // Update button for unliked state
+                        $(this).html('<i class="far fa-heart"></i> Like');  // Show unfilled heart for unliked state
                     }
                     // Update the like count display
                     likeCountElem.text(`${response.likes_count} Likes`);
@@ -444,6 +299,12 @@
         });
     });
     
+ 
+    
+    
+     
+
+
     
     
     document.addEventListener('DOMContentLoaded', function() {
