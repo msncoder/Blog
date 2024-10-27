@@ -119,16 +119,16 @@
                                     {% for comment in post.comments.all %}
                                     <div class="comment mb-3">
                                         <div class="d-flex align-items-center">
-                                            <div class="comment-text bg-light rounded p-2">
-                                                <strong>{{ comment.user.username }}</strong>
-                                                <p>{{ comment.content }}</p>
+                                            <div class="comment-text bg-light rounded p-2 text-dark">
+                                                <strong class="text-dark">{{ comment.user.username }}</strong>
+                                                <p class=>{{ comment.content }}</p>
                                             </div>
                                         </div>
                                     </div>
                                     {% endfor %}
                                 </div>
                                 <div class="d-flex align-items-center mt-3">
-                                    <form class="d-flex m-3" onsubmit="addComment(event, {{ post.id }});">
+                                    <form class="d-flex m-3 " onsubmit="addComment(event, {{ post.id }});">
                                         {% csrf_token %}
                                         <input type="text" name="content" class="form-control" placeholder="Write a comment..." required>
                                         <button type="submit" class="btn btn-primary ms-2">Comment</button>
@@ -193,7 +193,7 @@
             <form method="POST" action="{% url 'subscribe' %}" class="d-flex justify-content-center">
                 {% csrf_token %}
                 {{ form.email }}
-                <button type="submit" class="btn btn-outline-light">Subscribe</button>
+                <button type="submit" class="btn btn-outline-light m-1">Subscribe</button>
             </form>
         </div>
     </section>
@@ -211,28 +211,31 @@
 <script>
   
     
+    
+
+
     function addComment(event, postId) {
         event.preventDefault();  // Prevent the form from submitting normally
     
         const form = event.target;  // Get the form that triggered the event
         const content = form.querySelector('input[name="content"]').value;  // Get the content of the comment
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;  // Get CSRF token
     
         $.ajax({
             type: 'POST',
             url: `/post/${postId}/comment/`,  // URL to post comment
             data: {
                 content: content,
-                csrfmiddlewaretoken: '{{ csrf_token }}',  // CSRF token for security
+                csrfmiddlewaretoken: csrfToken,  // CSRF token for security
             },
             success: function(data) {
                 // On success, append the new comment to the comments area
                 const commentHtml = `
                     <div class="comment mb-3">
                         <div class="d-flex align-items-start">
-                            <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User">
                             <div class="comment-text bg-light rounded p-2">
-                                <strong>${data.username}</strong>
-                                <p>${data.content}</p>
+                                <strong class="text-dark">${data.username}</strong>
+                                <p class="text-dark">${data.content}</p>
                             </div>
                         </div>
                     </div>`;
@@ -246,11 +249,12 @@
                 console.error(error);  // Handle error
                 
                 // Show error modal with message
-                $('#errorMessage').text("Please Login to comment this post");
+                $('#errorMessage').text("Please Login to comment on this post");
                 $('#errorModal').modal('show');
             }
         });
     }
+    
     
     
     
